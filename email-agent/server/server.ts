@@ -10,6 +10,7 @@ import { ListenersManager } from "../ccsdk/listeners-manager";
 import { ActionsManager } from "../ccsdk/actions-manager";
 import { UIStateManager } from "../ccsdk/ui-state-manager";
 import { ComponentManager } from "../ccsdk/component-manager";
+import { Scheduler, DEFAULT_SCHEDULES } from "../ccsdk/scheduler";
 import {
   handleSyncEndpoint,
   handleSyncStatusEndpoint,
@@ -70,6 +71,9 @@ const listenersManager = new ListenersManager(
 // Initialize EmailSyncService with listenersManager
 const syncService = new EmailSyncService(DATABASE_PATH, listenersManager);
 
+// Initialize Scheduler for time-based listeners
+const scheduler = new Scheduler(listenersManager);
+
 // Initialize listeners, actions, and IDLE monitoring asynchronously
 (async () => {
   // Load all listeners at startup
@@ -114,6 +118,13 @@ const syncService = new EmailSyncService(DATABASE_PATH, listenersManager);
   }).catch((error) => {
     console.error('[Server] Failed to start component templates watcher:', error);
   });
+
+  // Initialize scheduled tasks
+  console.log('🕐 Initializing scheduler...');
+  for (const schedule of DEFAULT_SCHEDULES) {
+    scheduler.addSchedule(schedule);
+  }
+  console.log(`✅ Scheduler initialized with ${DEFAULT_SCHEDULES.length} schedule(s)`);
 
   // Start IDLE monitoring for live email notifications
   try {
@@ -339,4 +350,17 @@ const server = Bun.serve({
 
 console.log(`Server running at http://localhost:${server.port}`);
 console.log('WebSocket endpoint available at ws://localhost:3000/ws');
+
+// Graceful shutdown handlers
+process.on('SIGINT', () => {
+  console.log('\n🛑 Received SIGINT, shutting down gracefully...');
+  scheduler.stopAll();
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  console.log('\n🛑 Received SIGTERM, shutting down gracefully...');
+  scheduler.stopAll();
+  process.exit(0);
+});
 console.log('Visit http://localhost:3000 to view the email chat interface');
