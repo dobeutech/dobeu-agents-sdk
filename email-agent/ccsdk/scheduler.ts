@@ -122,8 +122,15 @@ export class Scheduler {
   stopSchedule(scheduleId: string): void {
     const timer = this.timers.get(scheduleId);
     if (timer) {
-      clearTimeout(timer);
-      clearInterval(timer);
+      // Clear both types - one will be a no-op depending on what type it is
+      // This is safe and handles both setTimeout and setInterval
+      if (typeof timer === 'number') {
+        clearTimeout(timer);
+        clearInterval(timer);
+      } else {
+        clearTimeout(timer);
+        clearInterval(timer);
+      }
       this.timers.delete(scheduleId);
       console.log(`[Scheduler] Stopped schedule: ${scheduleId}`);
     }
@@ -229,7 +236,7 @@ export const DEFAULT_SCHEDULES: ScheduleConfig[] = [
   {
     id: 'newsletter_digest',
     name: 'Newsletter Daily Digest',
-    runAt: '08:00',  // 8:00 AM daily
+    runAt: '08:05',  // 8:05 AM daily (staggered to avoid resource contention)
     enabled: true
   }
 ];

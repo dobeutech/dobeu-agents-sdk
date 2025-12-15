@@ -361,13 +361,27 @@ const server = Bun.serve({
     }
 
     if (url.pathname.match(/^\/api\/schedule\/[^/]+$/) && req.method === 'GET') {
-      const scheduleId = decodeURIComponent(url.pathname.split('/').pop()!);
-      return handleGetSchedule(req, scheduler, scheduleId);
+      const pathParts = url.pathname.split('/');
+      const scheduleId = pathParts[3];
+      if (!scheduleId) {
+        return new Response(JSON.stringify({ success: false, error: 'Invalid schedule ID' }), { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      return handleGetSchedule(req, scheduler, decodeURIComponent(scheduleId));
     }
 
     if (url.pathname.match(/^\/api\/schedule\/[^/]+$/) && req.method === 'PUT') {
-      const scheduleId = decodeURIComponent(url.pathname.split('/').pop()!);
-      return handleUpdateSchedule(req, scheduler, scheduleId);
+      const pathParts = url.pathname.split('/');
+      const scheduleId = pathParts[3];
+      if (!scheduleId) {
+        return new Response(JSON.stringify({ success: false, error: 'Invalid schedule ID' }), { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      return handleUpdateSchedule(req, scheduler, decodeURIComponent(scheduleId));
     }
 
     if (url.pathname.match(/^\/api\/schedule\/[^/]+\/enable$/) && req.method === 'POST') {
