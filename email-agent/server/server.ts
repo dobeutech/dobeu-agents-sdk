@@ -24,7 +24,14 @@ import {
   handleListUIStates,
   handleListUIStateTemplates,
   handleListComponentTemplates,
-  handleDeleteUIState
+  handleDeleteUIState,
+  handleGetSchedules,
+  handleGetSchedule,
+  handleEnableSchedule,
+  handleDisableSchedule,
+  handleTriggerSchedule,
+  handleUpdateSchedule,
+  handleAddSchedule
 } from "./endpoints";
 
 // Initialize managers
@@ -342,6 +349,43 @@ const server = Bun.serve({
 
     if (url.pathname === '/api/component-templates' && req.method === 'GET') {
       return handleListComponentTemplates(req, componentManager);
+    }
+
+    // Scheduler endpoints
+    if (url.pathname === '/api/schedules' && req.method === 'GET') {
+      return handleGetSchedules(req, scheduler);
+    }
+
+    if (url.pathname === '/api/schedules' && req.method === 'POST') {
+      return handleAddSchedule(req, scheduler);
+    }
+
+    if (url.pathname.match(/^\/api\/schedule\/[^/]+$/) && req.method === 'GET') {
+      const scheduleId = decodeURIComponent(url.pathname.split('/').pop()!);
+      return handleGetSchedule(req, scheduler, scheduleId);
+    }
+
+    if (url.pathname.match(/^\/api\/schedule\/[^/]+$/) && req.method === 'PUT') {
+      const scheduleId = decodeURIComponent(url.pathname.split('/').pop()!);
+      return handleUpdateSchedule(req, scheduler, scheduleId);
+    }
+
+    if (url.pathname.match(/^\/api\/schedule\/[^/]+\/enable$/) && req.method === 'POST') {
+      const pathParts = url.pathname.split('/');
+      const scheduleId = decodeURIComponent(pathParts[3]);
+      return handleEnableSchedule(req, scheduler, scheduleId);
+    }
+
+    if (url.pathname.match(/^\/api\/schedule\/[^/]+\/disable$/) && req.method === 'POST') {
+      const pathParts = url.pathname.split('/');
+      const scheduleId = decodeURIComponent(pathParts[3]);
+      return handleDisableSchedule(req, scheduler, scheduleId);
+    }
+
+    if (url.pathname.match(/^\/api\/schedule\/[^/]+\/trigger$/) && req.method === 'POST') {
+      const pathParts = url.pathname.split('/');
+      const scheduleId = decodeURIComponent(pathParts[3]);
+      return handleTriggerSchedule(req, scheduler, scheduleId);
     }
 
     return new Response('Not Found', { status: 404 });

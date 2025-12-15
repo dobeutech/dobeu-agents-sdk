@@ -9,3 +9,12 @@ export {
   handleListComponentTemplates,
   handleDeleteUIState
 } from './ui-states';
+export {
+  handleGetSchedules,
+  handleGetSchedule,
+  handleEnableSchedule,
+  handleDisableSchedule,
+  handleTriggerSchedule,
+  handleUpdateSchedule,
+  handleAddSchedule
+} from './scheduler';
