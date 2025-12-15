@@ -419,3 +419,124 @@ export interface ComponentModule {
   config: ComponentTemplate;
   Component: React.ComponentType<ComponentProps<any>>;
 }
+
+// ============================================================================
+// Invoice Tracker Types
+// ============================================================================
+
+/**
+ * Invoice record for tracking payments
+ */
+export interface InvoiceRecord {
+  id: string;
+  vendor: string;
+  vendorEmail: string;
+  invoiceNumber: string;
+  amount: number;
+  currency: string;
+  dueDate: string;
+  issueDate: string;
+  status: 'pending' | 'overdue' | 'paid' | 'disputed';
+  emailId: string;
+  trackedAt: string;
+  paidAt?: string;
+  remindersSent: number;
+  lastReminderDate?: string;
+  notes?: string;
+  category?: string;
+  lineItems?: string[];
+}
+
+/**
+ * Invoice tracker UI state
+ */
+export interface InvoiceTrackerState {
+  invoices: InvoiceRecord[];
+  totalPending: number;
+  totalOverdue: number;
+  totalPaid: number;
+  lastUpdated: string;
+  settings?: {
+    autoRemindDaysBefore: number;
+    reminderFrequencyDays: number;
+    maxReminders: number;
+  };
+}
+
+// ============================================================================
+// Newsletter Digest Types
+// ============================================================================
+
+/**
+ * Newsletter classification result
+ */
+export interface NewsletterClassification {
+  isNewsletter: boolean;
+  category: 'tech' | 'business' | 'finance' | 'lifestyle' | 'news' | 'other';
+  publication: string;
+  keyTopics: string[];
+  summary: string;
+  readTimeMinutes: number;
+}
+
+/**
+ * Collected newsletter for digest
+ */
+export interface CollectedNewsletter {
+  emailId: string;
+  publication: string;
+  category: string;
+  summary: string;
+  topics: string[];
+  receivedAt: string;
+}
+
+/**
+ * Newsletter digest state
+ */
+export interface NewsletterDigestState {
+  lastDigestDate: string;
+  totalDigestsSent: number;
+  pendingNewsletters: CollectedNewsletter[];
+  publications: {
+    name: string;
+    category: string;
+    lastSeen: string;
+    totalReceived: number;
+  }[];
+}
+
+// ============================================================================
+// Task Extraction Types
+// ============================================================================
+
+/**
+ * Task extracted from email
+ */
+export interface ExtractedTask {
+  id: string;
+  title: string;
+  description?: string;
+  priority: 'high' | 'medium' | 'low';
+  dueDate?: string;
+  sourceEmailId: string;
+  sourceSubject: string;
+  sourceFrom: string;
+  extractedAt: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  completedAt?: string;
+  tags?: string[];
+}
+
+/**
+ * Task board state
+ */
+export interface TaskBoardState {
+  tasks: ExtractedTask[];
+  categories: string[];
+  lastUpdated: string;
+  settings?: {
+    autoExtract: boolean;
+    defaultPriority: 'high' | 'medium' | 'low';
+  };
+}
